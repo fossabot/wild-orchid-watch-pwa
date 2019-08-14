@@ -91,6 +91,9 @@
           </li>
         </ul>
       </div>
+      <v-ons-list-item>
+        <wow-autocomplete />
+      </v-ons-list-item>
       <template v-for="currField of displayableObsFields">
         <v-ons-list-header
           :key="currField.id + '-list'"

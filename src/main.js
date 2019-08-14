@@ -1,5 +1,6 @@
 import 'onsenui/css/onsenui.css' // Onsen UI basic CSS
 import 'onsenui/css/onsen-css-components.css' // Default Onsen UI CSS components
+import 'v-autocomplete/dist/v-autocomplete.css'
 
 import './wow-global.css'
 
@@ -8,6 +9,7 @@ import VueOnsen from 'vue-onsenui' // TODO can import single modules from /esm/.
 import 'pwacompat'
 import * as Sentry from '@sentry/browser'
 import * as Integrations from '@sentry/integrations'
+import Autocomplete from 'v-autocomplete'
 
 import '@/misc/register-service-worker'
 import '@/misc/handle-network-status'
@@ -25,6 +27,7 @@ import {
 } from '@/misc/constants'
 
 Vue.use(VueOnsen)
+Vue.use(Autocomplete)
 Vue.config.productionTip = false
 
 Vue.use(VueGoogleMaps, {
