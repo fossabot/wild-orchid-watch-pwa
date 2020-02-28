@@ -542,19 +542,16 @@ registerRoute(
     // keep them in localForage so it's easy to clean up if anything goes wrong
     const depsRecord = {
       obsUuid: obsUuid,
-      photos: formData[constants.photosFieldName].map(e=>{
+      photos: formData[constants.photosFieldName].map(e => {
         // we create a File so we can encode the type of the photo in the
         // filename. Very sneaky ;)
         return new File([e.data], e.wowType, {
           type: e.mime,
         })
       }),
-      obsFields: formData [constants.obsFieldsFieldName]
-        .map(e => JSON.parse(e)),
+      obsFields: formData[constants.obsFieldsFieldName].map(e => JSON.parse(e)),
       deletedPhotoIds: formData[constants.photoIdsToDeleteFieldName],
-      deletedObsFieldIds: formData[
-        constants.obsFieldIdsToDeleteFieldName,
-      ],
+      deletedObsFieldIds: formData[constants.obsFieldIdsToDeleteFieldName],
     }
     await wowSwStore.setItem(updateTag + obsUuid, depsRecord)
     try {
