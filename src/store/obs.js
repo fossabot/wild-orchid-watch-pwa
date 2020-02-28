@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import base64js from 'base64-js'
 import moment from 'moment'
 import uuid from 'uuid/v1'
 import { wrap as comlinkWrap } from 'comlink'
@@ -1101,9 +1102,12 @@ const actions = {
       fd[constants.photosFieldName] = apiRecords.photoPostBodyPartials.map(
         curr => {
           const photoType = `wow-${curr.type}`
+          const base64Data = base64js.fromByteArray(
+            new Uint8Array(curr.file.data),
+          )
           return {
             mime: curr.file.mime,
-            data: curr.file.data,
+            data: base64Data,
             wowType: photoType,
           }
         },
@@ -1119,7 +1123,7 @@ const actions = {
         headers: {
           Authorization: rootState.auth.apiToken,
         },
-        body: JSON.strinfify(payload),
+        body: JSON.stringify(payload),
         retries: 0,
       })
     }

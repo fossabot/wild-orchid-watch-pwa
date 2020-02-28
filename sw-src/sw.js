@@ -3,6 +3,7 @@ import { Queue } from 'workbox-background-sync/Queue.mjs'
 import { precacheAndRoute as workboxPrecacheAndRoute } from 'workbox-precaching/precacheAndRoute.mjs'
 import { registerRoute } from 'workbox-routing/registerRoute.mjs'
 import { NetworkOnly } from 'workbox-strategies/NetworkOnly.mjs'
+import base64js from 'base64-js'
 import { getOrCreateInstance } from '../src/indexeddb/storage-manager.js'
 import { setRecordProcessingOutcome } from '../src/indexeddb/obs-store-common'
 import * as constants from '../src/misc/constants.js'
@@ -471,16 +472,14 @@ registerRoute(
   async ({ url, event, params }) => {
     console.debug('Service worker processing POSTed bundle')
     setAuthHeaderFromReq(event.request)
-    const formData = await event.request.formData()
-    const obsRecord = JSON.parse(formData.get(constants.obsFieldName))
+    const formData = await event.request.json()
+    const obsRecord = formData[constants.obsFieldName]
     const obsUuid = verifyNotImpendingDoom(obsRecord.observation.uuid)
-    const projectId = formData.get(constants.projectIdFieldName)
+    const projectId = formData[constants.projectIdFieldName]
     const depsRecord = {
       obsUuid: obsUuid,
-      photos: formData.getAll(constants.photosFieldName),
-      obsFields: formData
-        .getAll(constants.obsFieldsFieldName)
-        .map(e => JSON.parse(e)),
+      photos: formData[constants.photosFieldName],
+      obsFields: formData[constants.obsFieldsFieldName],
       projectId,
     }
     try {
@@ -545,11 +544,13 @@ registerRoute(
       photos: formData[constants.photosFieldName].map(e => {
         // we create a File so we can encode the type of the photo in the
         // filename. Very sneaky ;)
-        return new File([e.data], e.wowType, {
+        const data = base64js.toByteArray(e.data)
+        // FIXME can't create a File on Safari. Is there another way to set the name?
+        return new File([data], e.wowType, {
           type: e.mime,
         })
       }),
-      obsFields: formData[constants.obsFieldsFieldName].map(e => JSON.parse(e)),
+      obsFields: formData[constants.obsFieldsFieldName],
       deletedPhotoIds: formData[constants.photoIdsToDeleteFieldName],
       deletedObsFieldIds: formData[constants.obsFieldIdsToDeleteFieldName],
     }
