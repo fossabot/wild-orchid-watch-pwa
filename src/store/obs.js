@@ -1053,7 +1053,7 @@ const actions = {
           )
         }
         const projectId = state.projectInfo.id
-        formData.append(constants.projectIdFieldName, projectId)
+        formData[constants.projectIdFieldName] = projectId
         const resp = await doBundleEndpointFetch(formData, 'POST')
         if (!resp.ok) {
           throw new Error(
@@ -1094,43 +1094,32 @@ const actions = {
     await dispatch('refreshLocalRecordQueue')
     function generateFormData(dbRecordParam) {
       const apiRecords = mapObsFromOurDomainOntoApi(dbRecordParam)
-      const fd = new FormData()
-      fd.append(
-        constants.obsFieldName,
-        JSON.stringify(apiRecords.observationPostBody),
+      const fd = {}
+      fd[constants.obsFieldName] = apiRecords.observationPostBody
+      fd[constants.photoIdsToDeleteFieldName] =
+        dbRecordParam.wowMeta[constants.photoIdsToDeleteFieldName]
+      fd[constants.photosFieldName] = apiRecords.photoPostBodyPartials.map(
+        curr => {
+          const photoType = `wow-${curr.type}`
+          return {
+            mime: curr.file.mime,
+            data: curr.file.data,
+            wowType: photoType,
+          }
+        },
       )
-      for (const curr of dbRecordParam.wowMeta[
-        constants.photoIdsToDeleteFieldName
-      ]) {
-        fd.append(constants.photoIdsToDeleteFieldName, curr)
-      }
-      for (const curr of apiRecords.photoPostBodyPartials) {
-        const photoBlob = arrayBufferToBlob(curr.file.data, curr.file.mime)
-        // we create a File so we can encode the type of the photo in the
-        // filename. Very sneaky ;)
-        const photoType = `wow-${curr.type}`
-        const photoFile = new File([photoBlob], photoType, {
-          type: photoBlob.type,
-        })
-        fd.append(constants.photosFieldName, photoFile)
-      }
-      for (const curr of apiRecords.obsFieldPostBodyPartials) {
-        fd.append(constants.obsFieldsFieldName, JSON.stringify(curr))
-      }
-      for (const curr of dbRecordParam.wowMeta[
-        constants.obsFieldIdsToDeleteFieldName
-      ]) {
-        fd.append(constants.obsFieldIdsToDeleteFieldName, curr)
-      }
+      fd[constants.obsFieldsFieldName] = apiRecords.obsFieldPostBodyPartials
+      fd[constants.obsFieldIdsToDeleteFieldName] =
+        dbRecordParam.wowMeta[constants.obsFieldIdsToDeleteFieldName]
       return fd
     }
-    function doBundleEndpointFetch(fd, method) {
+    function doBundleEndpointFetch(payload, method) {
       return fetch(constants.serviceWorkerBundleMagicUrl, {
         method,
         headers: {
           Authorization: rootState.auth.apiToken,
         },
-        body: fd,
+        body: JSON.strinfify(payload),
         retries: 0,
       })
     }

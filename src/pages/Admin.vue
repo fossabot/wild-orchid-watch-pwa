@@ -359,23 +359,19 @@ export default {
     modelReady() {
       console.log('Model is loaded..')
     },
-    getLocation() {
-      this.locErrorMsg = null
-      if (!navigator.geolocation) {
-        this.locErrorMsg = 'User agent does not seem to support location'
-        return
-      }
-      navigator.geolocation.getCurrentPosition(
-        loc => {
-          this.lat = loc.coords.latitude
-          this.lng = loc.coords.longitude
-          this.alt = loc.coords.altitude
-          this.acc = loc.coords.accuracy
+    async getLocation() {
+      const fd = new FormData()
+      fd.append('blah', 1234)
+      const resp = await fetch(constants.serviceWorkerIsAliveMagicUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: 'whatefer',
         },
-        () => {
-          this.locErrorMsg = 'Location access is blocked'
-        },
-      )
+        body: JSON.stringify({
+          aa: new Uint8Array([0x1, 0x2, 0x33]),
+        }),
+      })
+      console.log(await resp.text())
     },
     doLogin() {
       this.$store.dispatch('auth/doLogin')

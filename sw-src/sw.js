@@ -534,22 +534,27 @@ registerRoute(
   async ({ url, event, params }) => {
     console.debug('Service worker processing PUTed bundle')
     setAuthHeaderFromReq(event.request)
-    const formData = await event.request.formData()
-    const obsRecord = JSON.parse(formData.get(constants.obsFieldName))
+    const formData = await event.request.json()
+    const obsRecord = formData[constants.obsFieldName]
     const obsUuid = verifyNotImpendingDoom(obsRecord.observation.uuid)
     const obsId = verifyNotImpendingDoom(obsRecord.observation.id)
     // We could queue all the deps because we have the obsId but it's easier to
     // keep them in localForage so it's easy to clean up if anything goes wrong
     const depsRecord = {
       obsUuid: obsUuid,
-      photos: formData.getAll(constants.photosFieldName),
-      obsFields: formData
-        .getAll(constants.obsFieldsFieldName)
+      photos: formData[constants.photosFieldName].map(e=>{
+        // we create a File so we can encode the type of the photo in the
+        // filename. Very sneaky ;)
+        return new File([e.data], e.wowType, {
+          type: e.mime,
+        })
+      }),
+      obsFields: formData [constants.obsFieldsFieldName]
         .map(e => JSON.parse(e)),
-      deletedPhotoIds: formData.getAll(constants.photoIdsToDeleteFieldName),
-      deletedObsFieldIds: formData.getAll(
+      deletedPhotoIds: formData[constants.photoIdsToDeleteFieldName],
+      deletedObsFieldIds: formData[
         constants.obsFieldIdsToDeleteFieldName,
-      ),
+      ],
     }
     await wowSwStore.setItem(updateTag + obsUuid, depsRecord)
     try {
@@ -619,6 +624,20 @@ registerRoute(
     })
   },
   'GET',
+)
+
+registerRoute(
+  constants.serviceWorkerIsAliveMagicUrl,
+  async ({ url, event, params }) => {
+    // const formData = await event.request.formData()
+    // const val = formData.get('blah')
+    const val = await event.request.json()
+    return jsonResponse({
+      result: 'posted',
+      val,
+    })
+  },
+  'POST',
 )
 
 // We have a separate endpoint to update the auth for the case when an obs is

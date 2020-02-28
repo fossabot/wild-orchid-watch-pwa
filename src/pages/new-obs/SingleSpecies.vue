@@ -322,12 +322,12 @@ export default {
   data() {
     return {
       photoMenu: [
-        { id: 'whole-plant', name: 'Whole plant', required: true },
+        { id: 'whole-plant', name: 'Whole plant' },
         { id: 'flower', name: 'Flower' },
         { id: 'leaf', name: 'Leaf' },
         { id: 'fruit', name: 'Fruit' },
-        { id: 'habitat', name: 'Habitat', required: true },
-        { id: 'micro-habitat', name: 'Micro-habitat', required: true },
+        { id: 'habitat', name: 'Habitat' },
+        { id: 'micro-habitat', name: 'Micro-habitat' },
         { id: 'canopy', name: 'Canopy' },
         { id: 'floral-visitors', name: 'Floral visitors' },
         { id: 'host-tree', name: 'Epiphyte host tree' },
@@ -865,14 +865,6 @@ export default {
       if (!this.speciesGuessValue) {
         this.formErrorMsgs.push(
           'You must identify this observation with a species name',
-        )
-      }
-      if (!this.isLocationAlreadyCaptured) {
-        this.formErrorMsgs.push(
-          'Observations *must* have geolocation' +
-            ' information. Either use your current location or attach a GPS' +
-            ' tagged photo. Scroll to the very top of this page for ' +
-            'more details.',
         )
       }
       const visibleRequiredObsFields = this.displayableObsFields.filter(

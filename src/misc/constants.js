@@ -315,7 +315,7 @@ const serviceWorkerMagicUrlPrefix = 'https://local.service-worker'
 export const serviceWorkerBundleMagicUrl =
   serviceWorkerMagicUrlPrefix + '/queue/obs-bundle'
 export const serviceWorkerIsAliveMagicUrl =
-  serviceWorkerMagicUrlPrefix + '/are-you-alive'
+  serviceWorkerMagicUrlPrefix + '/queue/are-you-alive'
 export const serviceWorkerUpdateAuthHeaderUrl =
   serviceWorkerMagicUrlPrefix + '/update-auth-header'
 
