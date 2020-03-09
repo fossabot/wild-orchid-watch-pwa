@@ -1,3 +1,4 @@
+import 'formdata-polyfill'
 import { Plugin as BackgroundSyncPlugin } from 'workbox-background-sync/Plugin.mjs'
 import { Queue } from 'workbox-background-sync/Queue.mjs'
 import { precacheAndRoute as workboxPrecacheAndRoute } from 'workbox-precaching/precacheAndRoute.mjs'
